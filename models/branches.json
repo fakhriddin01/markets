@@ -16,5 +16,11 @@
         "name": "HAVAS Yunusobod",
         "address": "Yunusobod",
         "marketId": 3
+    },
+    {
+        "branchId": 4,
+        "name": "Baraka Yunusuobod",
+        "address": "Yunusuobod",
+        "marketId": 4
     }
 ]

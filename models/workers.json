@@ -16,5 +16,11 @@
         "name": "Temur",
         "phoneNumber": "998901234567",
         "branchId": 3
+    },
+    {
+        "workerId": 4,
+        "name": "John",
+        "phoneNumber": "998901234567",
+        "branchId": 4
     }
 ]

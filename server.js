@@ -111,7 +111,14 @@ server.on('request', async (req, res)=>{
                         msg: 'please fill out all inputs'
                     }))
                 }
-
+                let markets= read('markets.json')
+                let foundMarketId = markets.find(m => m.marketId == newBranch.marketId);
+                if(!foundMarketId){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Please check market ID, market with this ID not found'
+                    }))
+                }
                 branches = read('branches.json');
                 branches.push({branchId: branches.at(-1).branchId +1, name: newBranch.name, address: newBranch.address, marketId: newBranch.marketId})
                 write_file('branches.json', branches);
@@ -143,6 +150,14 @@ server.on('request', async (req, res)=>{
                         msg: 'please fill out all inputs'
                     }))
                 }
+                let branches= read('branches.json')
+                let foundBranchId = branches.find(b => b.branchId == worker.branchId);
+                if(!foundBranchId){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Please check branch ID, branch with this ID not found'
+                    }))
+                }
                 let workers= read('workers.json');
                 workers.push({workerId: workers.at(-1).workerId + 1, name: worker.name, phoneNumber: worker.phoneNumber, branchId: worker.branchId})
                 write_file('workers.json', workers);
@@ -172,6 +187,14 @@ server.on('request', async (req, res)=>{
                     res.writeHead(400, options);
                     return res.end(JSON.stringify({
                         msg: 'please fill out all inputs'
+                    }))
+                }
+                let branches= read('branches.json')
+                let foundBranchId = branches.find(b => b.branchId == product.branchId);
+                if(!foundBranchId){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Please check branch ID, branch with this ID not found'
                     }))
                 }
                 let products= read('products.json');
