@@ -2,13 +2,19 @@
     {
         "workerId": 1,
         "name": "Eshmat",
-        "phoneNumber": "998901234567",
-        "branchId": 1
+        "phoneNumber": "998901234566",
+        "branchId": 2
     },
     {
         "workerId": 2,
         "name": "Toshmat",
         "phoneNumber": "998901234568",
         "branchId": 2
+    },
+    {
+        "workerId": 3,
+        "name": "Temur",
+        "phoneNumber": "998901234567",
+        "branchId": 3
     }
 ]

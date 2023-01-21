@@ -122,6 +122,37 @@ server.on('request', async (req, res)=>{
 
             })
         }
+
+        if(req.url == '/workers'){
+            req.on('data', chunk=>{
+                let worker = JSON.parse(chunk);
+                if(!(worker.name && worker.phoneNumber && worker.branchId)){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Please fill up the form correctly',
+                        form:   {
+                            "name": "",
+                            "phoneNumber": "",
+                            "branchId": ""
+                        }
+                    }))
+                }
+                if(worker.name.trim().length ==0 || worker.phoneNumber.trim().length ==0){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'please fill out all inputs'
+                    }))
+                }
+                let workers= read('workers.json');
+                workers.push({workerId: workers.at(-1).workerId + 1, name: worker.name, phoneNumber: worker.phoneNumber, branchId: worker.branchId})
+                write_file('workers.json', workers);
+                res.writeHead(200, options)
+                res.end(JSON.stringify({
+                    msg: 'worker added!'
+                }))
+
+            })
+        }
         
     }
     if(req.method == 'GET'){
@@ -231,6 +262,28 @@ server.on('request', async (req, res)=>{
             res.writeHead(200, options)
             res.end(JSON.stringify(foundBranch));
         }
+
+
+        if(req.url == '/workers'){
+            let workers = read('workers.json')
+            res.writeHead(200, options);
+            res.end(JSON.stringify(workers));
+        }
+
+        if(req.url == `/workers/${id}`){
+            let workers = read('workers.json');
+            let foundWorker = workers.find(w => w.workerId == id);
+            if(!foundWorker){
+                res.writeHead(400, options);
+                return res.end(JSON.stringify({
+                    msg: 'worker with this id not found'
+                }))
+            }
+
+            res.writeHead(200, options);
+            res.end(JSON.stringify(foundWorker));
+
+        }
     }
 
     if(req.method == 'PUT'){
@@ -296,6 +349,33 @@ server.on('request', async (req, res)=>{
                 }))
             })
         }
+
+        if(req.url == `/workers/${id}`){
+            req.on('data', chunk =>{
+                let worker = JSON.parse(chunk);
+                let workers=read('workers.json');
+                let foundWorker;
+                workers.forEach(w => {
+                    if(w.workerId == id){
+                        foundWorker = w;
+                        w.name = worker.name || w.name;
+                        w.phoneNumber = worker.phoneNumber || w.phoneNumber;
+                        w.branchId = worker.branchId || w.branchId;
+                    }
+                })
+                if(!foundWorker){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'worker with this id not found'
+                    }))
+                }
+                write_file('workers.json', workers);
+                res.writeHead(200, options)
+                res.end(JSON.stringify({
+                    msg: 'worker info updated!'
+                }))
+            })
+        }
     }
 
     if(req.method == 'DELETE'){
@@ -350,6 +430,28 @@ server.on('request', async (req, res)=>{
                 msg: "branch deleted!! "
             }))
 
+        }
+        if(req.url == `/workers/${id}`){
+            let workers = read('workers.json');
+            let foundWorker; 
+            workers.forEach((w, inx) =>{
+                if(w.workerId == id){
+                    foundWorker = w;
+                    workers.splice(inx, 1);
+                }
+            })
+            if(!foundWorker){
+                res.writeHead(400, options);
+                return res.end(JSON.stringify({
+                    msg: 'worker with this id not found'
+                })) 
+            }
+
+            write_file('workers.json', workers);
+            res.writeHead(200, options)
+            res.end(JSON.stringify({
+                msg: "worker deleted!! "
+            }))
         }
     }
 
