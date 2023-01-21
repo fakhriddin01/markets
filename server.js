@@ -61,7 +61,28 @@ server.on('request', async (req, res)=>{
                     }))
                 }
 
-                markets.push({marketId: markets.at(-1).marketId +1, ...data})
+                if(!data.name){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Please fill up the form correctly',
+                        form:   {
+                            "name": "market name"
+                        }
+                    }))
+                }
+
+                if(data.name.trim().length == 0){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'please fill out inputs'
+                    }))
+                }
+
+                markets.push(
+                {
+                    marketId: markets.at(-1).marketId +1, 
+                    name: data.name
+                })
                 write_file('markets.json', markets)
                 res.writeHead(200, options)
                 res.end(JSON.stringify({
@@ -92,7 +113,7 @@ server.on('request', async (req, res)=>{
                 }
 
                 branches = read('branches.json');
-                branches.push({branchId: branches.at(-1).branchId +1, ...newBranch})
+                branches.push({branchId: branches.at(-1).branchId +1, name: newBranch.name, address: newBranch.address, marketId: newBranch.marketId})
                 write_file('branches.json', branches);
                 res.writeHead(200, options)
                 res.end(JSON.stringify({
@@ -154,14 +175,17 @@ server.on('request', async (req, res)=>{
             branches.forEach(b => {
                 let workerlar = [];
                 let productlar = [];
+                delete b.marketId;
                 products.forEach(p => {
                     if(p.branchId == b.branchId){
+                        delete p.branchId;
                         productlar.push(p)
                     }
                 })
                 b['products'] = productlar;
                 workers.forEach(w => {
                     if(w.branchId == b.branchId){
+                        delete w.branchId;
                         workerlar.push(w);
                     }
                 })
@@ -191,16 +215,19 @@ server.on('request', async (req, res)=>{
             let productlar = [];
             products.forEach(p => {
                 if(p.branchId == foundBranch.branchId){
+                    delete p.branchId;
                     productlar.push(p)
                 }
             })
             foundBranch['products'] = productlar;
             workers.forEach(w => {
                 if(w.branchId == foundBranch.branchId){
+                    delete w.branchId;
                     workerlar.push(w);
                 }
             })
             foundBranch['workers'] = workerlar;
+            delete foundBranch.marketId;
             res.writeHead(200, options)
             res.end(JSON.stringify(foundBranch));
         }
@@ -241,6 +268,34 @@ server.on('request', async (req, res)=>{
             })
             
         }
+
+        if(req.url == `/branches/${id}`){
+            req.on('data', chunk =>{
+                let update = JSON.parse(chunk);
+                let branches = read('branches.json');
+                let foundBrach;
+                branches.forEach(b => {
+                    if(b.branchId == id){
+                        foundBrach = b;
+                        b.name = update.name || b.name;
+                        b.address = update.address || b.address;
+                        b.marketId = update.marketId || b.marketId;
+                    }
+                })
+                if(!foundBrach){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Branch with this id not found'
+                    })) 
+                }
+
+                write_file('branches.json', branches);
+                res.writeHead(200, options)
+                res.end(JSON.stringify({
+                    msg: 'Branch updated!'
+                }))
+            })
+        }
     }
 
     if(req.method == 'DELETE'){
@@ -272,7 +327,33 @@ server.on('request', async (req, res)=>{
                 msg: "market deleted!! "
             }))
         }
+
+        if(req.url == `/branches/${id}`){
+            let branches = read('branches.json');
+            let foundBrach;
+            branches.forEach((b, inx) => {
+                if(b.branchId == id){
+                    foundBrach = b;
+                    branches.splice(inx, 1);
+                }
+            })
+            if(!foundBrach){
+                res.writeHead(400, options);
+                return res.end(JSON.stringify({
+                    msg: 'branch with this id not found'
+                })) 
+            }
+
+            write_file('branches.json', branches);
+            res.writeHead(200, options)
+            res.end(JSON.stringify({
+                msg: "branch deleted!! "
+            }))
+
+        }
     }
+
+    
 
 
 })
