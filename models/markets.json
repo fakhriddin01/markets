@@ -4,11 +4,15 @@
         "name": "Makro"
     },
     {
-        "marketId":2,
+        "marketId": 2,
         "name": "Karzinka"
     },
     {
-        "marketId":3,
-        "name": "Havas"
+        "marketId": 3,
+        "name": "Havas2"
+    },
+    {
+        "marketId": 4,
+        "name": "Baraka"
     }
 ]
