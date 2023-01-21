@@ -153,6 +153,37 @@ server.on('request', async (req, res)=>{
 
             })
         }
+
+        if(req.url == '/products'){
+            req.on('data', chunk=>{
+                let product = JSON.parse(chunk);
+                if(!(product.title && product.price && product.branchId)){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'Please fill up the form correctly',
+                        form:   {
+                            "title": "",
+                            "price": "",
+                            "branchId": ""
+                        }
+                    }))
+                }
+                if(product.title.trim().length ==0 || product.price.trim().length ==0){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'please fill out all inputs'
+                    }))
+                }
+                let products= read('products.json');
+                products.push({productId: products.at(-1).productId + 1, title: product.title, price: product.price, branchId: product.branchId})
+                write_file('products.json', products);
+                res.writeHead(200, options)
+                res.end(JSON.stringify({
+                    msg: 'product added!'
+                }))
+
+            })
+        }
         
     }
     if(req.method == 'GET'){
@@ -284,6 +315,27 @@ server.on('request', async (req, res)=>{
             res.end(JSON.stringify(foundWorker));
 
         }
+
+        if(req.url == '/products'){
+            let products = read('products.json')
+            res.writeHead(200, options);
+            res.end(JSON.stringify(products));
+        }
+
+        if(req.url == `/products/${id}`){
+            let products = read('products.json');
+            let foundProduct = products.find(p => p.productId == id);
+            if(!foundProduct){
+                res.writeHead(400, options);
+                return res.end(JSON.stringify({
+                    msg: 'product with this id not found'
+                }))
+            }
+
+            res.writeHead(200, options);
+            res.end(JSON.stringify(foundProduct));
+
+        }
     }
 
     if(req.method == 'PUT'){
@@ -376,6 +428,34 @@ server.on('request', async (req, res)=>{
                 }))
             })
         }
+
+
+        if(req.url == `/products/${id}`){
+            req.on('data', chunk =>{
+                let product = JSON.parse(chunk);
+                let products=read('products.json');
+                let foundProduct;
+                products.forEach(p => {
+                    if(p.productId == id){
+                        foundProduct = p;
+                        p.title = product.title || p.title;
+                        p.price = product.price || p.price;
+                        p.branchId = product.branchId || p.branchId;
+                    }
+                })
+                if(!foundProduct){
+                    res.writeHead(400, options);
+                    return res.end(JSON.stringify({
+                        msg: 'product with this id not found'
+                    }))
+                }
+                write_file('products.json', products);
+                res.writeHead(200, options)
+                res.end(JSON.stringify({
+                    msg: 'product info updated!'
+                }))
+            })
+        }
     }
 
     if(req.method == 'DELETE'){
@@ -431,6 +511,7 @@ server.on('request', async (req, res)=>{
             }))
 
         }
+
         if(req.url == `/workers/${id}`){
             let workers = read('workers.json');
             let foundWorker; 
@@ -451,6 +532,29 @@ server.on('request', async (req, res)=>{
             res.writeHead(200, options)
             res.end(JSON.stringify({
                 msg: "worker deleted!! "
+            }))
+        }
+
+        if(req.url == `/products/${id}`){
+            let products = read('products.json');
+            let foundProduct; 
+            products.forEach((p, inx) =>{
+                if(p.productId == id){
+                    foundProduct = p;
+                    products.splice(inx, 1);
+                }
+            })
+            if(!foundProduct){
+                res.writeHead(400, options);
+                return res.end(JSON.stringify({
+                    msg: 'product with this id not found'
+                })) 
+            }
+
+            write_file('products.json', products);
+            res.writeHead(200, options)
+            res.end(JSON.stringify({
+                msg: "product deleted!! "
             }))
         }
     }

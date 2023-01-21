@@ -1,14 +1,20 @@
 [
-    {
-        "productId": 1,
-        "title": "Olma",
-        "price": "100000",
-        "branchId": 1
-    },
-    {
-        "productId": 2,
-        "title": "Anor",
-        "price": "200000",
-        "branchId": 2
-    }
+  {
+    "productId": 1,
+    "title": "Olma",
+    "price": "100000",
+    "branchId": 1
+  },
+  {
+    "productId": 2,
+    "title": "Qizil Anor",
+    "price": "300000",
+    "branchId": 2
+  },
+  {
+    "productId": 3,
+    "title": "Non",
+    "price": "1600",
+    "branchId": 3
+  }
 ]
