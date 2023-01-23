@@ -8,7 +8,7 @@
     {
         "productId": 2,
         "title": "Qizil Anor",
-        "price": "300000",
+        "price": "1000000",
         "branchId": 2
     },
     {
@@ -18,9 +18,9 @@
         "branchId": 3
     },
     {
-        "productId": 4,
-        "title": "Sut",
-        "price": "10000",
-        "branchId": 4
+        "productId": 5,
+        "title": "Non",
+        "price": "2000",
+        "branchId": 5
     }
 ]

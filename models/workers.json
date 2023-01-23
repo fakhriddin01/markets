@@ -18,9 +18,9 @@
         "branchId": 3
     },
     {
-        "workerId": 4,
-        "name": "John",
+        "workerId": 5,
+        "name": "worker",
         "phoneNumber": "998901234567",
-        "branchId": 4
+        "branchId": 5
     }
 ]
